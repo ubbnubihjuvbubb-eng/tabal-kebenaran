@@ -1,0 +1,664 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logic Lab - Simulator Kebenaran</title>
+<style>
+:root {
+  --bg:#0b1020;
+  --panel:#171f35;
+  --purple:#a78bfa;
+  --green:#4ade80;
+  --red:#fb7185;
+  --muted:#9caac8;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:var(--bg);
+  color:#fff;
+}
+header {
+  padding:22px 6%;
+  background:#11182b;
+  border-bottom:1px solid #29334d;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.logo { font-size:22px;font-weight:bold;color:var(--purple); }
+.logo span { color:white; }
+header small { color:var(--muted); }
+main { max-width:1100px;margin:auto;padding:24px 18px 100px; }
+.hero {
+  padding:30px;
+  border-radius:24px;
+  background:linear-gradient(135deg,#30245b,#172440,#151c31);
+  margin-bottom:22px;
+}
+.hero h1 { font-size:clamp(27px,5vw,43px);margin:12px 0; }
+.hero p { color:#c4cbe0;line-height:1.7; }
+.tag { color:var(--purple);font-size:12px;font-weight:bold;letter-spacing:2px; }
+.grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px; }
+.card {
+  background:var(--panel);
+  border:1px solid #29334d;
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:16px;
+}
+.card h3 { margin-top:0; }
+.muted { color:var(--muted);line-height:1.6; }
+button {
+  background:var(--purple);
+  color:#151026;
+  border:0;
+  padding:12px 16px;
+  border-radius:11px;
+  cursor:pointer;
+  font-weight:bold;
+  margin:4px 3px 4px 0;
+}
+button:hover { filter:brightness(1.12); }
+button.secondary {
+  background:#28334e;color:#fff;border:1px solid #3b4766;
+}
+input,select,textarea {
+  width:100%;
+  padding:13px;
+  border-radius:10px;
+  border:1px solid #3b4766;
+  background:#0e1528;
+  color:#fff;
+  font-size:15px;
+  margin:8px 0 12px;
+}
+label { color:#d6def1;font-size:14px; }
+nav {
+  display:flex;gap:8px;flex-wrap:wrap;
+  margin-bottom:20px;
+}
+nav button { flex:1;min-width:90px; }
+nav button.active { background:var(--purple); }
+.page { display:none; }
+.page.active { display:block; }
+table { border-collapse:collapse;width:100%;min-width:320px; }
+th,td { padding:13px;text-align:center;border-bottom:1px solid #303b55; }
+th { background:#342858;color:#e9ddff; }
+tr:nth-child(even) { background:#202a41; }
+.true { color:var(--green);font-weight:bold; }
+.false { color:var(--red);font-weight:bold; }
+.table-wrap { overflow-x:auto;margin-top:15px; }
+.result { border-radius:12px;padding:14px;margin-top:14px;background:#222d45; }
+.pill { display:inline-block;padding:7px 10px;border-radius:8px;background:#302750;color:#d9c9ff;font-size:12px; }
+footer { text-align:center;color:var(--muted);padding:25px; }
+.question { font-size:23px;font-weight:bold;line-height:1.5; }
+.progress { background:#303b55;height:8px;border-radius:8px;overflow:hidden; }
+.progress div { height:100%;background:var(--purple);width:0; }
+@media(max-width:500px) {
+  header { padding:18px; }
+  main { padding:18px 12px 80px; }
+  .hero { padding:22px; }
+  nav button { font-size:12px;padding:10px 6px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">✦ LOGIC<span> LAB</span></div>
+  <small>Simulator Logika Proposisi</small>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="tag">SMART LOGIC SIMULATOR</div>
+    <h1>Belajar logika.<br>Buktikan kebenarannya.</h1>
+    <p>Buat tabel kebenaran otomatis, pahami operator logika,
+    dan uji pengetahuanmu dalam satu aplikasi.</p>
+    <button onclick="showPage('simulator')">Mulai Simulasi →</button>
+  </section>
+
+  <nav>
+    <button class="active" data-page="home" onclick="showPage('home')">⌂ Beranda</button>
+    <button data-page="simulator" onclick="showPage('simulator')">∑ Simulator</button>
+    <button data-page="verifikator" onclick="showPage('verifikator')">✓ Verifikator</button>
+    <button data-page="materi" onclick="showPage('materi')">▤ Materi</button>
+    <button data-page="kuis" onclick="showPage('kuis')">★ Kuis</button>
+  </nav>
+
+  <section id="home" class="page active">
+    <h2>Dashboard</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="tag">01 / SIMULASI</div>
+        <h3>Generator Tabel</h3>
+        <p class="muted">Buat kombinasi benar dan salah secara otomatis.</p>
+        <button onclick="showPage('simulator')">Buka Simulator</button>
+      </div>
+      <div class="card">
+        <div class="tag">02 / VERIFIKASI</div>
+        <h3>Verifikator Argumen</h3>
+        <p class="muted">Uji apakah kesimpulan mengikuti semua premis.</p>
+        <button class="secondary" onclick="showPage('verifikator')">Uji Argumen</button>
+      </div>
+      <div class="card">
+        <div class="tag">03 / PEMBELAJARAN</div>
+        <h3>Materi Logika</h3>
+        <p class="muted">Pelajari NOT, AND, OR, XOR dan implikasi.</p>
+        <button class="secondary" onclick="showPage('materi')">Belajar</button>
+      </div>
+      <div class="card">
+        <div class="tag">04 / LATIHAN</div>
+        <h3>Kuis Interaktif</h3>
+        <p class="muted">Latihan soal dan dapatkan skor otomatis.</p>
+        <button class="secondary" onclick="showPage('kuis')">Mulai Kuis</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>📊 Ringkasan</h3>
+      <div class="grid">
+        <div><div class="muted">Simulasi berhasil</div><h2 id="statSim">0</h2></div>
+        <div><div class="muted">Variabel terakhir</div><h2 id="statVar">0</h2></div>
+        <div><div class="muted">Skor kuis terbaik</div><h2 id="statScore">0</h2></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Riwayat Simulasi</h3>
+      <div id="history" class="muted">Belum ada riwayat.</div>
+      <button class="secondary" onclick="clearHistory()">Hapus Riwayat</button>
+    </div>
+  </section>
+
+  <section id="simulator" class="page">
+    <h2>∑ Simulator Tabel Kebenaran</h2>
+    <p class="muted">Masukkan ekspresi logika. Variabel dideteksi otomatis.</p>
+    <div class="card">
+      <label for="expr">Ekspresi logika</label>
+      <input id="expr" value="p AND q" placeholder="Contoh: (p AND q) OR NOT r">
+      <div class="muted">Contoh cepat:</div>
+      <div id="examples">
+        <button class="secondary" onclick="setExpr('p AND q')">p AND q</button>
+        <button class="secondary" onclick="setExpr('p OR q')">p OR q</button>
+        <button class="secondary" onclick="setExpr('NOT p')">NOT p</button>
+        <button class="secondary" onclick="setExpr('p -> q')">p → q</button>
+        <button class="secondary" onclick="setExpr('p <-> q')">p ↔ q</button>
+        <button class="secondary" onclick="setExpr('(p AND q) OR NOT r')">(p AND q) OR NOT r</button>
+      </div>
+      <button onclick="generate()">⚡ Generate Tabel</button>
+      <button class="secondary" onclick="downloadCSV()">↓ Ekspor CSV</button>
+      <div id="error" style="color:var(--red);margin-top:10px"></div>
+    </div>
+    <div id="output"></div>
+  </section>
+
+  <section id="verifikator" class="page">
+    <h2>✓ Verifikator Validitas Argumen</h2>
+    <p class="muted">Masukkan satu premis pada setiap baris, lalu masukkan kesimpulan. Argumen valid jika tidak ada kombinasi yang membuat semua premis benar tetapi kesimpulan salah.</p>
+    <div class="card">
+      <label for="premises">Premis (satu ekspresi per baris)</label>
+      <textarea id="premises" rows="4" style="width:100%;padding:13px;border-radius:10px;border:1px solid #3b4766;background:#0e1528;color:#fff;font:inherit;margin:8px 0 12px">p -> q
+p</textarea>
+      <label for="conclusion">Kesimpulan</label>
+      <input id="conclusion" value="q" placeholder="Contoh: q">
+      <div class="muted">Contoh: Premis p → q dan p, kesimpulan q (modus ponens).</div>
+      <button onclick="verifyArgument()">✓ Verifikasi Argumen</button>
+      <button class="secondary" onclick="loadArgumentExample()">Muat Contoh</button>
+      <div id="verifyError" style="color:var(--red);margin-top:10px"></div>
+    </div>
+    <div id="verifyOutput"></div>
+  </section>
+
+  <section id="materi" class="page">
+    <h2>📚 Materi Logika Proposisi</h2>
+    <div class="grid">
+      <div class="card"><h3>¬ NOT (Negasi)</h3><p class="muted">Membalik nilai kebenaran.</p><p>NOT T = F<br>NOT F = T</p></div>
+      <div class="card"><h3>∧ AND (Konjungsi)</h3><p class="muted">Benar jika keduanya benar.</p><p>T AND T = T<br>T AND F = F</p></div>
+      <div class="card"><h3>∨ OR (Disjungsi)</h3><p class="muted">Benar jika minimal satu benar.</p><p> T OR F = T<br>F OR F = F</p></div>
+      <div class="card"><h3>⊕ XOR</h3><p class="muted">Benar jika nilainya berbeda.</p><p>T XOR F = T<br>T XOR T = F</p></div>
+      <div class="card"><h3>→ Implikasi</h3><p class="muted">Salah hanya jika p benar dan q salah.</p><p>T → F = F<br>F → T = T</p></div>
+      <div class="card"><h3>↔ Biimplikasi</h3><p class="muted">Benar jika kedua nilai sama.</p><p>T ↔ T = T<br>T ↔ F = F</p></div>
+    </div>
+    <h2>Klasifikasi Ekspresi</h2>
+    <div class="card"><h3 class="true">Tautologi</h3><p class="muted">Semua baris bernilai benar.</p></div>
+    <div class="card"><h3 class="false">Kontradiksi</h3><p class="muted">Semua baris bernilai salah.</p></div>
+    <div class="card"><h3>Kontingensi</h3><p class="muted">Memiliki hasil benar dan salah.</p></div>
+    <div class="card">
+      <h3>Urutan Operasi</h3>
+      <p class="muted">1. Tanda kurung<br>2. NOT<br>3. AND<br>4. XOR<br>5. OR<br>6. Implikasi<br>7. Biimplikasi</p>
+    </div>
+  </section>
+
+  <section id="kuis" class="page">
+    <h2>★ Kuis Logika</h2>
+    <div class="card">
+      <div class="muted" id="quizProgress">Pertanyaan 1 dari 5</div>
+      <div class="progress"><div id="bar"></div></div>
+      <p class="question" id="question"></p>
+      <div id="answers"></div>
+      <div id="feedback" class="result" style="display:none"></div>
+      <button id="nextBtn" onclick="nextQuestion()" style="display:none">Berikutnya →</button>
+      <button class="secondary" onclick="restartQuiz()">Ulangi Kuis</button>
+    </div>
+  </section>
+</main>
+<footer>LOGIC LAB © 2026 · Belajar Logika dengan Mudah</footer>
+
+<script>
+let lastTable = null;
+let simulationCount = 0;
+let historyList = [];
+let bestScore = 0;
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b =>
+    b.classList.toggle('active', b.dataset.page === id));
+}
+
+function setExpr(value) {
+  document.getElementById('expr').value = value;
+  generate();
+}
+
+function tokenize(s) {
+  const pattern = /\s*(<->|<=>|->|=>|&&|\|\||[()!~&|^]|[A-Za-z][A-Za-z0-9_]*)/gy;
+  const tokens = [];
+  let pos = 0;
+  while (pos < s.length) {
+    if (/^\s+$/.test(s.slice(pos))) break;
+    pattern.lastIndex = pos;
+    const m = pattern.exec(s);
+    if (!m) throw Error('Karakter tidak dikenal pada: ' + s.slice(pos, pos + 8));
+    tokens.push(m[1]);
+    pos = pattern.lastIndex;
+  }
+  if (!tokens.length) throw Error('Masukkan ekspresi terlebih dahulu.');
+  return tokens;
+}
+
+function parseExpression(source, values) {
+  const tokens = tokenize(source);
+  let i = 0;
+  const peek = () => tokens[i];
+  const match = (...ops) => {
+    if (ops.some(op => op.toUpperCase() === (peek() || '').toUpperCase())) {
+      i++;
+      return true;
+    }
+    return false;
+  };
+
+  function primary() {
+    if (match('NOT', '!', '~')) return !primary();
+    if (match('(')) {
+      const v = iff();
+      if (!match(')')) throw Error("Kurung tutup ')' belum ada.");
+      return v;
+    }
+    const t = tokens[i++];
+    if (t === undefined) throw Error('Ekspresi belum lengkap.');
+    const upper = t.toUpperCase();
+    if (upper === 'TRUE' || upper === 'T') return true;
+    if (upper === 'FALSE' || upper === 'F') return false;
+    if (Object.hasOwn(values, t)) return values[t];
+    throw Error('Variabel atau token tidak dikenal: ' + t);
+  }
+
+  function and() {
+    let v = primary();
+    while (match('AND', '&', '&&')) {
+      const b = primary();
+      v = v && b;
+    }
+    return v;
+  }
+
+  function xor() {
+    let v = and();
+    while (match('XOR', '^')) {
+      const b = and();
+      v = v !== b;
+    }
+    return v;
+  }
+
+  function or() {
+    let v = xor();
+    while (match('OR', '|', '||')) {
+      const b = xor();
+      v = v || b;
+    }
+    return v;
+  }
+
+  function implication() {
+    const a = or();
+    if (match('->', '=>')) return !a || implication();
+    return a;
+  }
+
+  function iff() {
+    let v = implication();
+    while (match('<->', '<=>')) {
+      const b = implication();
+      v = v === b;
+    }
+    return v;
+  }
+
+  const result = iff();
+  if (i !== tokens.length) throw Error('Ekspresi tidak valid dekat: ' + tokens[i]);
+  return result;
+}
+
+function generate() {
+  const expression = document.getElementById('expr').value.trim();
+  const output = document.getElementById('output');
+  document.getElementById('error').textContent = '';
+  output.innerHTML = '';
+
+  try {
+    const tokens = tokenize(expression);
+    const reserved = ['AND','OR','NOT','XOR','TRUE','FALSE','T','F'];
+    const vars = [...new Set(tokens.filter(t =>
+      /^[A-Za-z][A-Za-z0-9_]*$/.test(t) &&
+      !reserved.includes(t.toUpperCase())
+    ))].sort();
+
+    if (!vars.length) throw Error('Gunakan minimal satu variabel, misalnya p AND q.');
+    if (vars.length > 10) throw Error('Maksimal 10 variabel.');
+
+    const rows = [];
+    for (let n = 0; n < 2 ** vars.length; n++) {
+      const values = {};
+      vars.forEach((v, j) => {
+        values[v] = Boolean((n >> (vars.length - j - 1)) & 1);
+      });
+      rows.push({values, result:parseExpression(expression, values)});
+    }
+
+    const results = rows.map(r => r.result);
+    const type = results.every(Boolean) ? 'TAUTOLOGI' :
+      results.every(v => !v) ? 'KONTRADIKSI' : 'KONTINGENSI';
+
+    lastTable = {expression, vars, rows};
+    simulationCount++;
+    historyList.unshift(expression);
+    historyList = historyList.slice(0, 10);
+
+    document.getElementById('statSim').textContent = simulationCount;
+    document.getElementById('statVar').textContent = vars.length;
+    renderHistory();
+
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+
+    const title = document.createElement('h3');
+    title.textContent = 'Hasil Tabel Kebenaran';
+    wrap.appendChild(title);
+
+    const pill = document.createElement('span');
+    pill.className = 'pill';
+    pill.textContent = type;
+    wrap.appendChild(pill);
+
+    const desc = document.createElement('p');
+    desc.className = 'muted';
+    desc.textContent = `${rows.length} kombinasi · Variabel: ${vars.join(', ')}`;
+    wrap.appendChild(desc);
+
+    const tableWrap = document.createElement('div');
+    tableWrap.className = 'table-wrap';
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const tr = document.createElement('tr');
+    [...vars, expression].forEach(name => {
+      const th = document.createElement('th');
+      th.textContent = name;
+      tr.appendChild(th);
+    });
+    thead.appendChild(tr);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    rows.forEach(row => {
+      const tr = document.createElement('tr');
+      [...vars.map(v => row.values[v]), row.result].forEach(value => {
+        const td = document.createElement('td');
+        td.textContent = value ? 'T' : 'F';
+        td.className = value ? 'true' : 'false';
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    tableWrap.appendChild(table);
+    wrap.appendChild(tableWrap);
+
+    const explanation = document.createElement('div');
+    explanation.className = 'result';
+    explanation.textContent =
+      type === 'TAUTOLOGI' ? 'Semua kombinasi menghasilkan BENAR.' :
+      type === 'KONTRADIKSI' ? 'Semua kombinasi menghasilkan SALAH.' :
+      'Ekspresi memiliki hasil BENAR dan SALAH.';
+    wrap.appendChild(explanation);
+    output.appendChild(wrap);
+  } catch (e) {
+    document.getElementById('error').textContent = e.message;
+  }
+}
+
+function loadArgumentExample() {
+  document.getElementById('premises').value = 'p -> q\np';
+  document.getElementById('conclusion').value = 'q';
+  verifyArgument();
+}
+
+function getVariables(expressions) {
+  const reserved = ['AND','OR','NOT','XOR','TRUE','FALSE','T','F'];
+  return [...new Set(expressions.flatMap(expression => tokenize(expression)).filter(t =>
+    /^[A-Za-z][A-Za-z0-9_]*$/.test(t) && !reserved.includes(t.toUpperCase())
+  ))].sort();
+}
+
+function verifyArgument() {
+  const rawPremises = document.getElementById('premises').value;
+  const premises = rawPremises.split(/\n|;/).map(s => s.trim()).filter(Boolean);
+  const conclusion = document.getElementById('conclusion').value.trim();
+  const output = document.getElementById('verifyOutput');
+  const error = document.getElementById('verifyError');
+  output.innerHTML = '';
+  error.textContent = '';
+
+  try {
+    if (!premises.length) throw Error('Masukkan minimal satu premis.');
+    if (!conclusion) throw Error('Masukkan kesimpulan.');
+    const expressions = [...premises, conclusion];
+    const vars = getVariables(expressions);
+    if (!vars.length) throw Error('Gunakan minimal satu variabel, misalnya p dan q.');
+    if (vars.length > 10) throw Error('Maksimal 10 variabel.');
+
+    const rows = [];
+    for (let n = 0; n < 2 ** vars.length; n++) {
+      const values = {};
+      vars.forEach((v, j) => values[v] = Boolean((n >> (vars.length - j - 1)) & 1));
+      const premiseResults = premises.map(p => parseExpression(p, values));
+      const conclusionResult = parseExpression(conclusion, values);
+      const allPremisesTrue = premiseResults.every(Boolean);
+      rows.push({values, premiseResults, conclusionResult, counterexample: allPremisesTrue && !conclusionResult});
+    }
+
+    const valid = !rows.some(row => row.counterexample);
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    const resultTitle = document.createElement('h3');
+    resultTitle.className = valid ? 'true' : 'false';
+    resultTitle.textContent = valid ? 'ARGUMEN VALID' : 'ARGUMEN TIDAK VALID';
+    wrap.appendChild(resultTitle);
+    const summary = document.createElement('p');
+    summary.className = 'muted';
+    summary.textContent = valid
+      ? 'Tidak ditemukan baris ketika semua premis benar dan kesimpulan salah.'
+      : 'Ditemukan contoh tandingan: semua premis benar, tetapi kesimpulan salah.';
+    wrap.appendChild(summary);
+
+    const tableWrap = document.createElement('div');
+    tableWrap.className = 'table-wrap';
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    [...vars, ...premises.map((_, i) => 'Premis ' + (i + 1)), 'Kesimpulan', 'Contoh tandingan'].forEach(label => {
+      const th = document.createElement('th'); th.textContent = label; headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow); table.appendChild(thead);
+    const tbody = document.createElement('tbody');
+    rows.forEach(row => {
+      const tr = document.createElement('tr');
+      const values = [...vars.map(v => row.values[v]), ...row.premiseResults, row.conclusionResult, row.counterexample];
+      values.forEach(value => {
+        const td = document.createElement('td');
+        td.textContent = value ? 'T' : 'F';
+        td.className = value ? 'true' : 'false';
+        tr.appendChild(td);
+      });
+      if (row.counterexample) tr.style.outline = '2px solid var(--red)';
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody); tableWrap.appendChild(table); wrap.appendChild(tableWrap);
+    const details = document.createElement('p');
+    details.className = 'muted';
+    details.textContent = 'T = Benar, F = Salah. Baris contoh tandingan ditandai dengan garis merah.';
+    wrap.appendChild(details);
+    output.appendChild(wrap);
+  } catch (e) {
+    error.textContent = e.message;
+  }
+}
+
+function downloadCSV() {
+  if (!lastTable) {
+    alert('Generate tabel terlebih dahulu!');
+    return;
+  }
+  const {expression, vars, rows} = lastTable;
+  const lines = [
+    [...vars, expression].map(v => '"' + v.replace(/"/g,'""') + '"').join(','),
+    ...rows.map(r => [...vars.map(v => r.values[v]), r.result]
+      .map(v => v ? 'T' : 'F').join(','))
+  ];
+  const blob = new Blob(['\uFEFF' + lines.join('\r\n')], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'tabel-kebenaran.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function renderHistory() {
+  const el = document.getElementById('history');
+  el.innerHTML = '';
+  if (!historyList.length) {
+    el.textContent = 'Belum ada riwayat.';
+    return;
+  }
+  historyList.forEach(expression => {
+    const btn = document.createElement('button');
+    btn.className = 'secondary';
+    btn.textContent = expression;
+    btn.onclick = () => {
+      document.getElementById('expr').value = expression;
+      showPage('simulator');
+      generate();
+    };
+    el.appendChild(btn);
+  });
+}
+
+function clearHistory() {
+  historyList = [];
+  renderHistory();
+}
+
+const questions = [
+  {q:'TRUE AND FALSE = ?', a:['Benar','Salah'], correct:1},
+  {q:'NOT FALSE = ?', a:['Benar','Salah'], correct:0},
+  {q:'TRUE OR FALSE = ?', a:['Benar','Salah'], correct:0},
+  {q:'TRUE XOR TRUE = ?', a:['Benar','Salah'], correct:1},
+  {q:'FALSE -> TRUE = ?', a:['Benar','Salah'], correct:0}
+];
+
+let qi = 0, score = 0, locked = false;
+
+function renderQuiz() {
+  const q = questions[qi];
+  document.getElementById('quizProgress').textContent =
+    qi < questions.length ? `Pertanyaan ${qi+1} dari ${questions.length}` : 'Kuis selesai';
+  document.getElementById('bar').style.width =
+    (qi / questions.length * 100) + '%';
+  document.getElementById('question').textContent =
+    qi < questions.length ? q.q : `Skor akhir: ${score} / ${questions.length}`;
+  const answers = document.getElementById('answers');
+  answers.innerHTML = '';
+  document.getElementById('feedback').style.display = 'none';
+  document.getElementById('nextBtn').style.display = 'none';
+
+  if (qi >= questions.length) {
+    bestScore = Math.max(bestScore, score);
+    document.getElementById('statScore').textContent = bestScore;
+    document.getElementById('bar').style.width = '100%';
+    const p = document.createElement('p');
+    p.className = 'muted';
+    p.textContent = score >= 4 ? 'Hebat! Pemahaman logikamu bagus.' : 'Terus belajar dan coba lagi!';
+    answers.appendChild(p);
+    return;
+  }
+
+  locked = false;
+  q.a.forEach((answer, index) => {
+    const btn = document.createElement('button');
+    btn.className = 'secondary';
+    btn.textContent = answer;
+    btn.style.display = 'block';
+    btn.style.width = '100%';
+    btn.onclick = () => {
+      if (locked) return;
+      locked = true;
+      const correct = index === q.correct;
+      if (correct) score++;
+      const feedback = document.getElementById('feedback');
+      feedback.style.display = 'block';
+      feedback.textContent = correct ? '✓ Jawaban benar!' :
+        'Jawaban benar: ' + q.a[q.correct];
+      feedback.style.color = correct ? 'var(--green)' : 'var(--red)';
+      document.getElementById('nextBtn').style.display = 'inline-block';
+      document.getElementById('nextBtn').textContent =
+        qi === questions.length - 1 ? 'Lihat Hasil' : 'Berikutnya →';
+    };
+    answers.appendChild(btn);
+  });
+}
+
+function nextQuestion() {
+  qi++;
+  renderQuiz();
+}
+
+function restartQuiz() {
+  qi = 0;
+  score = 0;
+  renderQuiz();
+}
+
+renderQuiz();
+renderHistory();
+generate();
+</script>
+</body>
+</html>
