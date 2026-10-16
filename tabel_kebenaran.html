@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logic Lab - Kuis Tabel Kebenaran</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b0e14',
+                        cardBg: '#1e293b',
+                        cardBorder: '#334155',
+                        accentPurple: '#8b5cf6',
+                        accentPurpleHover: '#a855f7',
+                        accentGlow: 'rgba(139, 92, 246, 0.25)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #0b0e14;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+        .glow-purple {
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.18);
+        }
+        .tab-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .tab-btn.active {
+            background-color: #8b5cf6;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+            border-color: #a855f7;
+        }
+        /* Table Styles */
+        .quiz-table th, .quiz-table td {
+            border: 1px solid #334155;
+            padding: 8px 12px;
+            text-align: center;
+        }
+        .quiz-table th {
+            background-color: #0f172a;
+            color: #c084fc;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0e14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8b5cf6;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen justify-between p-3 sm:p-6 lg:p-10 max-w-6xl mx-auto">
+
+    <!-- TOP HEADER / HERO BANNER -->
+    <header class="w-full bg-cardBg border border-cardBorder rounded-2xl p-6 sm:p-8 mb-6 shadow-xl relative overflow-hidden glow-purple">
+        <div class="absolute -right-10 -top-10 w-60 h-60 bg-accentPurple rounded-full filter blur-[100px] opacity-20 pointer-events-none"></div>
+        <div class="relative z-10 max-w-3xl">
+            <span class="text-xs font-bold tracking-widest text-accentPurple uppercase bg-accentPurple/10 px-3 py-1 rounded-full border border-accentPurple/20 inline-block mb-3">
+                SMART LOGIC SIMULATOR
+            </span>
+            <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight mb-3">
+                Belajar logika.<br class="hidden sm:inline"/> Buktikan kebenarannya.
+            </h1>
+            <p class="text-gray-400 text-sm leading-relaxed mb-5 max-w-2xl">
+                Buat tabel kebenaran otomatis, pahami operator logika, dan uji pengetahuanmu dalam kuis interaktif tabel kebenaran.
+            </p>
+            <button onclick="switchTab('quiz')" class="bg-accentPurple hover:bg-accentPurpleHover text-white font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 shadow-lg shadow-accentPurple/30 hover:scale-105 active:scale-95 flex items-center gap-2 text-sm">
+                Mulai Kuis Tabel Kebenaran <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3 mb-6 text-sm font-medium">
+        <button onclick="switchTab('home')" id="tab-home" class="tab-btn bg-cardBg border border-cardBorder hover:border-accentPurple text-gray-300 py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-center">
+            <i class="fa-solid fa-house text-xs"></i> Beranda
+        </button>
+        <button onclick="switchTab('simulator')" id="tab-simulator" class="tab-btn bg-cardBg border border-cardBorder hover:border-accentPurple text-gray-300 py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-center">
+            <i class="fa-solid fa-calculator text-xs"></i> Simulator
+        </button>
+        <button onclick="switchTab('verifier')" id="tab-verifier" class="tab-btn bg-cardBg border border-cardBorder hover:border-accentPurple text-gray-300 py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-center">
+            <i class="fa-solid fa-check-double text-xs"></i> Verifikator
+        </button>
+        <button onclick="switchTab('material')" id="tab-material" class="tab-btn bg-cardBg border border-cardBorder hover:border-accentPurple text-gray-300 py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-center">
+            <i class="fa-solid fa-book-open text-xs"></i> Materi
+        </button>
+        <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn active col-span-2 sm:col-span-1 bg-cardBg border border-cardBorder hover:border-accentPurple text-gray-300 py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-center">
+            <i class="fa-solid fa-star text-xs"></i> Kuis
+        </button>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="w-full flex-grow mb-8">
+
+        <!-- SECTION 1: BERANDA -->
+        <section id="sec-home" class="hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-cardBg border border-cardBorder p-6 rounded-2xl hover:border-accentPurple/50 transition">
+                    <div class="w-12 h-12 bg-accentPurple/20 text-accentPurple rounded-xl flex items-center justify-center mb-4 text-xl">
+                        <i class="fa-solid fa-table"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Tabel Kebenaran Visual</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Evaluasi langsung sel-sel tabel kebenaran untuk ekspresi logika tunggal maupun majemuk.
+                    </p>
+                </div>
+                <div class="bg-cardBg border border-cardBorder p-6 rounded-2xl hover:border-accentPurple/50 transition">
+                    <div class="w-12 h-12 bg-accentPurple/20 text-accentPurple rounded-xl flex items-center justify-center mb-4 text-xl">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Tautologi & Kontradiksi</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Kenali karakteristik hasil akhir ekspresi logika melalui analisis hasil tabel kebenaran secara cepat.
+                    </p>
+                </div>
+                <div class="bg-cardBg border border-cardBorder p-6 rounded-2xl hover:border-accentPurple/50 transition">
+                    <div class="w-12 h-12 bg-accentPurple/20 text-accentPurple rounded-xl flex items-center justify-center mb-4 text-xl">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Pembahasan Otomatis</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Dapatkan pembahasan detail setiap langkah inferensi tabel kebenaran setelah menjawab.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white mb-2">Siap Menguji Pemahaman Tabel Kebenaran?</h2>
+                    <p class="text-gray-400 text-sm">Cobalah kuis interaktif dengan 10 variasi soal tentang tabel kebenaran.</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="switchTab('material')" class="bg-slate-800 hover:bg-slate-700 text-gray-200 border border-slate-600 px-5 py-2.5 rounded-xl font-medium text-sm transition">
+                        Lihat Materi
+                    </button>
+                    <button onclick="switchTab('quiz')" class="bg-accentPurple hover:bg-accentPurpleHover text-white px-5 py-2.5 rounded-xl font-medium text-sm transition shadow-lg shadow-accentPurple/20">
+                        Mulai Kuis
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: SIMULATOR (TRUTH TABLE GENERATOR) -->
+        <section id="sec-simulator" class="hidden space-y-6">
+            <div class="bg-cardBg border border-cardBorder p-6 sm:p-8 rounded-2xl">
+                <h2 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-calculator text-accentPurple"></i> Simulator Tabel Kebenaran
+                </h2>
+                <p class="text-gray-400 text-sm mb-6">
+                    Ketik ekspresi logika menggunakan variabel <code class="text-accentPurple font-mono">P</code>, <code class="text-accentPurple font-mono">Q</code>, <code class="text-accentPurple font-mono">R</code> dan operator seperti <code class="text-accentPurple font-mono">AND</code>, <code class="text-accentPurple font-mono">OR</code>, <code class="text-accentPurple font-mono">XOR</code>, <code class="text-accentPurple font-mono">NOT</code>, <code class="text-accentPurple font-mono">IMPLIES</code>.
+                </p>
+
+                <!-- Input Box -->
+                <div class="space-y-4 mb-6">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input type="text" id="sim-input" placeholder="Contoh: P AND (NOT Q OR R)" class="flex-grow bg-darkBg border border-cardBorder focus:border-accentPurple text-white px-4 py-3 rounded-xl focus:outline-none font-mono text-sm">
+                        <button onclick="generateTruthTable()" class="bg-accentPurple hover:bg-accentPurpleHover text-white px-6 py-3 rounded-xl font-semibold transition shadow-lg shadow-accentPurple/20">
+                            Generate Tabel
+                        </button>
+                    </div>
+
+                    <!-- Quick Operators Helper -->
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="text-gray-400 py-1">Sisipkan cepat:</span>
+                        <button onclick="insertOp('AND')" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded text-purple-300 font-mono">AND</button>
+                        <button onclick="insertOp('OR')" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded text-purple-300 font-mono">OR</button>
+                        <button onclick="insertOp('XOR')" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded text-purple-300 font-mono">XOR</button>
+                        <button onclick="insertOp('NOT')" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded text-purple-300 font-mono">NOT</button>
+                        <button onclick="insertOp('IMPLIES')" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded text-purple-300 font-mono">IMPLIES</button>
+                    </div>
+                </div>
+
+                <!-- Result Table -->
+                <div id="sim-result" class="overflow-x-auto">
+                    <div class="text-center py-8 text-gray-500 border border-dashed border-cardBorder rounded-xl">
+                        Tabel kebenaran otomatis akan dirender di sini.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: VERIFIKATOR -->
+        <section id="sec-verifier" class="hidden space-y-6">
+            <div class="bg-cardBg border border-cardBorder p-6 sm:p-8 rounded-2xl">
+                <h2 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-check-double text-accentPurple"></i> Verifikator Kesetaraan Logika
+                </h2>
+                <p class="text-gray-400 text-sm mb-6">
+                    Bandingkan dua ekspresi logika untuk memeriksa apakah tabel kebenarannya identik (Ekuivalen).
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-2 uppercase">Ekspresi A</label>
+                        <input type="text" id="ver-expr-a" placeholder="Contoh: NOT (P AND Q)" class="w-full bg-darkBg border border-cardBorder focus:border-accentPurple text-white px-4 py-3 rounded-xl focus:outline-none font-mono text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-2 uppercase">Ekspresi B</label>
+                        <input type="text" id="ver-expr-b" placeholder="Contoh: NOT P OR NOT Q" class="w-full bg-darkBg border border-cardBorder focus:border-accentPurple text-white px-4 py-3 rounded-xl focus:outline-none font-mono text-sm">
+                    </div>
+                </div>
+
+                <button onclick="verifyEquivalence()" class="w-full bg-accentPurple hover:bg-accentPurpleHover text-white py-3 rounded-xl font-semibold transition shadow-lg shadow-accentPurple/20 mb-6">
+                    Periksa Kesetaraan
+                </button>
+
+                <div id="ver-result"></div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: MATERI -->
+        <section id="sec-material" class="hidden space-y-6">
+            <div class="bg-cardBg border border-cardBorder p-6 rounded-2xl mb-6">
+                <h2 class="text-xl font-bold text-white mb-2">Panduan Tabel Kebenaran</h2>
+                <p class="text-gray-400 text-sm leading-relaxed">
+                    Tabel kebenaran adalah tabel matematika yang digunakan dalam logika untuk menentukan nilai kebenaran dari suatu ekspresi logika berdasarkan kombinasi masukan variabelnya.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- AND -->
+                <div class="bg-cardBg border border-cardBorder p-6 rounded-2xl">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-lg font-bold text-white">Konjungsi (AND / ∧)</h3>
+                        <span class="text-xs font-mono bg-accentPurple/20 text-accentPurple px-2.5 py-1 rounded">P ∧ Q</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Bernilai <b>TRUE (T)</b> hanya jika semua variabel bernilai TRUE.</p>
+                    <table class="quiz-table w-full text-xs font-mono">
+                        <tr><th>P</th><th>Q</th><th>P ∧ Q</th></tr>
+                        <tr><td>T</td><td>T</td><td class="text-green-400 font-bold">T</td></tr>
+                        <tr><td>T</td><td>F</td><td class="text-red-400 font-bold">F</td></tr>
+                        <tr><td>F</td><td>T</td><td class="text-red-400 font-bold">F</td></tr>
+                        <tr><td>F</td><td>F</td><td class="text-red-400 font-bold">F</td></tr>
+                    </table>
+                </div>
+
+                <!-- OR -->
+                <div class="bg-cardBg border border-cardBorder p-6 rounded-2xl">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-lg font-bold text-white">Disjungsi (OR / ∨)</h3>
+                        <span class="text-xs font-mono bg-accentPurple/20 text-accentPurple px-2.5 py-1 rounded">P ∨ Q</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Bernilai <b>TRUE (T)</b> jika salah satu atau kedua variabel bernilai TRUE.</p>
+                    <table class="quiz-table w-full text-xs font-mono">
+                        <tr><th>P</th><th>Q</th><th>P ∨ Q</th></tr>
+                        <tr><td>T</td><td>T</td><td class="text-green-400 font-bold">T</td></tr>
+                        <tr><td>T</td><td>F</td><td class="text-green-400 font-bold">T</td></tr>
+                        <tr><td>F</td><td>T</td><td class="text-green-400 font-bold">T</td></tr>
+                        <tr><td>F</td><td>F</td><td class="text-red-400 font-bold">F</td></tr>
+                    </table>
+                </div>
+
+                <!-- IMPLICATION -->
+                <div class="bg-cardBg border border-cardBorder p-6 rounded-2xl">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-lg font-bold text-white">Implikasi (→)</h3>
+                        <span class="text-xs font-mono bg-accentPurple/20 text-accentPurple px-2.5 py-1 rounded">P → Q</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Bernilai <b>FALSE (F)</b> hanya jika kondisi awal (P) True namun akibat (Q) False.</p>
+                    <table class="quiz-table w-full text-xs font-mono">
+                        <tr><th>P</th><th>Q</th><th>P → Q</th></tr>
+                        <tr><td>T</td><td>T</td><td class="text-green-400 font-bold">T</td></tr>
+                        <tr><td>T</td><td>F</td><td class="text-red-400 font-bold">F</td></tr>
+                        <tr><td>F</td><td>T</td><td class="text-green-400 font-bold">T</td></tr>
+                        <tr><td>F</td><td>F</td><td class="text-green-400 font-bold">T</td></tr>
+                    </table>
+                </div>
+
+                <!-- XOR -->
+                <div class="bg-cardBg border border-cardBorder p-6 rounded-2xl">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-lg font-bold text-white">XOR / Exclusive OR (⊕)</h3>
+                        <span class="text-xs font-mono bg-accentPurple/20 text-accentPurple px-2.5 py-1 rounded">P ⊕ Q</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Bernilai <b>TRUE (T)</b> jika nilai kebenaran kedua variabel saling berbeda.</p>
+                    <table class="quiz-table w-full text-xs font-mono">
+                        <tr><th>P</th><th>Q</th><th>P ⊕ Q</th></tr>
+                        <tr><td>T</td><td>T</td><td class="text-red-400 font-bold">F</td></tr>
+                        <tr><td>T</td><td>F</td><td class="text-green-400 font-bold">T</td></tr>
+                        <tr><td>F</td><td>T</td><td class="text-green-400 font-bold">T</td></tr>
+                        <tr><td>F</td><td>F</td><td class="text-red-400 font-bold">F</td></tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: KUIS TABEL KEBENARAN -->
+        <section id="sec-quiz" class="space-y-6">
+
+            <!-- QUIZ PLAY CARD -->
+            <div id="quiz-card" class="bg-cardBg border border-cardBorder rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+                <h2 class="text-xl font-extrabold text-white mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-star text-accentPurple"></i> Kuis Tabel Kebenaran
+                </h2>
+
+                <!-- Progress Header -->
+                <div class="space-y-2 mb-6">
+                    <div class="flex justify-between text-xs text-gray-400 font-medium">
+                        <span id="quiz-progress-text">Pertanyaan 1 dari 10</span>
+                        <span id="quiz-score-live" class="text-accentPurple font-bold">Skor: 0</span>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-darkBg rounded-full h-2.5 overflow-hidden border border-cardBorder">
+                        <div id="quiz-progress-bar" class="bg-accentPurple h-2.5 rounded-full transition-all duration-300" style="width: 10%"></div>
+                    </div>
+                </div>
+
+                <!-- Question Main Display -->
+                <div class="mb-6 space-y-4">
+                    <h3 id="quiz-question-title" class="text-lg sm:text-xl font-bold text-white tracking-wide">
+                        Lengkapi sel bertanda '?' pada tabel kebenaran berikut:
+                    </h3>
+
+                    <!-- TRUTH TABLE VISUAL DISPLAY -->
+                    <div id="quiz-table-container" class="overflow-x-auto my-4 bg-darkBg/60 p-4 rounded-xl border border-cardBorder flex justify-center">
+                        <!-- Dynamic Truth Table rendered here -->
+                    </div>
+                </div>
+
+                <!-- Options List -->
+                <div id="quiz-options" class="grid grid-cols-1 gap-3 mb-6">
+                    <!-- Dynamic option buttons -->
+                </div>
+
+                <!-- Instant Feedback Banner -->
+                <div id="quiz-feedback" class="hidden p-4 rounded-xl text-sm mb-6 transition-all duration-200">
+                    <!-- Feedback Message -->
+                </div>
+
+                <!-- Action Footer -->
+                <div class="flex justify-between items-center pt-4 border-t border-cardBorder">
+                    <button onclick="resetQuiz()" class="text-xs text-gray-400 hover:text-white px-4 py-2.5 rounded-xl bg-darkBg border border-cardBorder transition flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i> Ulangi Kuis
+                    </button>
+                    <button id="btn-next-q" onclick="nextQuestion()" class="hidden bg-accentPurple hover:bg-accentPurpleHover text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition flex items-center gap-2 shadow-lg shadow-accentPurple/20">
+                        Pertanyaan Selanjutnya <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- QUIZ RESULT BOX -->
+            <div id="quiz-result-box" class="hidden bg-cardBg border border-cardBorder p-8 rounded-2xl text-center space-y-6">
+                <div class="w-20 h-20 bg-accentPurple/20 text-accentPurple rounded-full flex items-center justify-center mx-auto text-3xl">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white mb-1">Kuis Selesai!</h2>
+                    <p class="text-gray-400 text-sm" id="result-evaluation-text">Hasil evaluasi pemahaman tabel kebenaran Anda.</p>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 max-w-md mx-auto py-4 bg-darkBg border border-cardBorder rounded-xl">
+                    <div>
+                        <div class="text-xs text-gray-400 mb-1">Skor Akhir</div>
+                        <div id="res-score" class="text-2xl font-extrabold text-accentPurple">0</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-400 mb-1">Benar</div>
+                        <div id="res-correct" class="text-2xl font-extrabold text-green-400">0</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-400 mb-1">Salah</div>
+                        <div id="res-wrong" class="text-2xl font-extrabold text-red-400">0</div>
+                    </div>
+                </div>
+
+                <div class="flex justify-center gap-4 pt-2">
+                    <button onclick="resetQuiz()" class="bg-accentPurple hover:bg-accentPurpleHover text-white font-semibold px-6 py-3 rounded-xl transition text-sm shadow-lg shadow-accentPurple/20">
+                        Ulangi Kuis Lagi
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="w-full text-center text-xs text-gray-500 py-6 border-t border-cardBorder/50 mt-auto">
+        LOGIC LAB © 2026 · Belajar Logika dengan Mudah
+    </footer>
+
+    <!-- JAVASCRIPT CODE -->
+    <script>
+        // --- 10 SPECIALIZED TRUTH TABLE QUIZ QUESTIONS ---
+        const truthTableQuestions = [
+            {
+                qTitle: "Lengkapi nilai sel bertanda '?' untuk operasi XOR (P ⊕ Q):",
+                table: {
+                    headers: ["P", "Q", "P ⊕ Q"],
+                    rows: [
+                        ["T", "T", "F"],
+                        ["T", "F", "?"],
+                        ["F", "T", "T"],
+                        ["F", "F", "F"]
+                    ]
+                },
+                options: ["T (Benar)", "F (Salah)"],
+                answer: 0,
+                explanation: "Pada baris kedua, P = T dan Q = F. Operasi XOR (Exclusive OR) bernilai TRUE jika masukan berbeda."
+            },
+            {
+                qTitle: "Lengkapi nilai sel '?' pada tabel implikasi (P → Q):",
+                table: {
+                    headers: ["P", "Q", "P → Q"],
+                    rows: [
+                        ["T", "T", "T"],
+                        ["T", "F", "?"],
+                        ["F", "T", "T"],
+                        ["F", "F", "T"]
+                    ]
+                },
+                options: ["T (Benar)", "F (Salah)"],
+                answer: 1,
+                explanation: "Implikasi P → Q bernilai FALSE hanya ketika P = T (Benar) dan Q = F (Salah)."
+            },
+            {
+                qTitle: "Berapakah nilai hasil evaluasi pada sel '?' untuk ekspresi ¬P ∨ Q?",
+                table: {
+                    headers: ["P", "Q", "¬P", "¬P ∨ Q"],
+                    rows: [
+                        ["T", "T", "F", "T"],
+                        ["T", "F", "F", "F"],
+                        ["F", "T", "T", "?"],
+                        ["F", "F", "T", "T"]
+                    ]
+                },
+                options: ["T (Benar)", "F (Salah)"],
+                answer: 0,
+                explanation: "Pada baris ke-3, ¬P = T dan Q = T. Operasi OR (∨) antara T dan T menghasilkan T (Benar)."
+            },
+            {
+                qTitle: "Perhatikan tabel kebenaran untuk ekspresi P ∧ ¬Q berikut. Manakah nilai sel '?' yang tepat?",
+                table: {
+                    headers: ["P", "Q", "¬Q", "P ∧ ¬Q"],
+                    rows: [
+                        ["T", "T", "F", "?"],
+                        ["T", "F", "T", "T"],
+                        ["F", "T", "F", "F"],
+                        ["F", "F", "T", "F"]
+                    ]
+                },
+                options: ["T (Benar)", "F (Salah)"],
+                answer: 1,
+                explanation: "Pada baris pertama, P = T dan ¬Q = F. Operasi AND (∧) antara T dan F menghasilkan F (Salah)."
+            },
+            {
+                qTitle: "Manakah urutan nilai kolom hasil (dari atas ke bawah) untuk ekspresi (P ∧ Q) ∨ ¬P?",
+                table: {
+                    headers: ["P", "Q", "P ∧ Q", "¬P", "(P ∧ Q) ∨ ¬P"],
+                    rows: [
+                        ["T", "T", "T", "F", "T"],
+                        ["T", "F", "F", "F", "F"],
+                        ["F", "T", "F", "T", "T"],
+                        ["F", "F", "F", "T", "T"]
+                    ]
+                },
+                options: ["T, F, T, T", "T, T, F, F", "F, T, T, T", "T, F, F, T"],
+                answer: 0,
+                explanation: "Kolom hasil dari atas ke bawah adalah: Row 1 = T∨F=T, Row 2 = F∨F=F, Row 3 = F∨T=T, Row 4 = F∨T=T."
+            },
+            {
+                qTitle: "Berapa jumlah baris pada tabel kebenaran yang memiliki 3 variabel proposisi (P, Q, R)?",
+                table: {
+                    headers: ["P", "Q", "R", "Formula (P ∧ Q) → R"],
+                    rows: [
+                        ["T", "T", "T", "..."],
+                        ["...", "...", "...", "..."],
+                        ["F", "F", "F", "..."]
+                    ]
+                },
+                options: ["4 baris", "6 baris", "8 baris", "16 baris"],
+                answer: 2,
+                explanation: "Jumlah baris dihitung menggunakan rumus 2^n, dengan n = jumlah variabel. Untuk 3 variabel (P, Q, R): 2^3 = 8 baris."
+            },
+            {
+                qTitle: "Berdasarkan tabel kebenaran berikut, apakah jenis dari ekspresi P ∨ ¬P?",
+                table: {
+                    headers: ["P", "¬P", "P ∨ ¬P"],
+                    rows: [
+                        ["T", "F", "T"],
+                        ["F", "T", "T"]
+                    ]
+                },
+                options: ["Tautologi (Selalu True)", "Kontradiksi (Selalu False)", "Kontingensi (Campuran)"],
+                answer: 0,
+                explanation: "Karena semua sel pada kolom hasil bernilai T (True), maka ekspresi logika ini merupakan Tautologi."
+            },
+            {
+                qTitle: "Apakah jenis hasil dari ekspresi P ∧ ¬P berdasarkan tabel kebenarannya?",
+                table: {
+                    headers: ["P", "¬P", "P ∧ ¬P"],
+                    rows: [
+                        ["T", "F", "F"],
+                        ["F", "T", "F"]
+                    ]
+                },
+                options: ["Tautologi", "Kontradiksi", "Kontingensi"],
+                answer: 1,
+                explanation: "Suatu ekspresi dikatakan Kontradiksi apabila seluruh nilai pada kolom akhir tabel kebenaran bernilai F (False)."
+            },
+            {
+                qTitle: "Tentukan nilai sel '?' untuk Hukum De Morgan: ¬(P ∨ Q)",
+                table: {
+                    headers: ["P", "Q", "P ∨ Q", "¬(P ∨ Q)"],
+                    rows: [
+                        ["T", "T", "T", "F"],
+                        ["T", "F", "T", "F"],
+                        ["F", "T", "T", "F"],
+                        ["F", "F", "F", "?"]
+                    ]
+                },
+                options: ["T (Benar)", "F (Salah)"],
+                answer: 0,
+                explanation: "Pada baris ke-4, P ∨ Q = F. Negasi dari F adalah T (Benar)."
+            },
+            {
+                qTitle: "Lengkapi nilai sel '?' pada ekspresi Bi-implikasi (P ↔ Q):",
+                table: {
+                    headers: ["P", "Q", "P ↔ Q"],
+                    rows: [
+                        ["T", "T", "T"],
+                        ["T", "F", "F"],
+                        ["F", "T", "F"],
+                        ["F", "F", "?"]
+                    ]
+                },
+                options: ["T (Benar)", "F (Salah)"],
+                answer: 0,
+                explanation: "Bi-implikasi P ↔ Q bernilai TRUE ketika kedua variabel memiliki nilai kebenaran yang sama (keduanya T atau keduanya F)."
+            }
+        ];
+
+        // --- STATE VARIABLES ---
+        let currentIndex = 0;
+        let score = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let selectedOptionIndex = null;
+
+        // --- NAVIGATION CONTROLLER ---
+        function switchTab(tabName) {
+            const sections = ['home', 'simulator', 'verifier', 'material', 'quiz'];
+            sections.forEach(sec => {
+                document.getElementById(`sec-${sec}`).classList.add('hidden');
+                document.getElementById(`tab-${sec}`).classList.remove('active');
+            });
+
+            document.getElementById(`sec-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        // --- QUIZ LOGIC ---
+        function initQuiz() {
+            currentIndex = 0;
+            score = 0;
+            correctCount = 0;
+            wrongCount = 0;
+            document.getElementById('quiz-result-box').classList.add('hidden');
+            document.getElementById('quiz-card').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function resetQuiz() {
+            initQuiz();
+        }
+
+        function loadQuestion() {
+            const qData = truthTableQuestions[currentIndex];
+            selectedOptionIndex = null;
+
+            // Stats
+            document.getElementById('quiz-progress-text').innerText = `Pertanyaan ${currentIndex + 1} dari ${truthTableQuestions.length}`;
+            document.getElementById('quiz-score-live').innerText = `Skor: ${score}`;
+            const progressPercent = ((currentIndex + 1) / truthTableQuestions.length) * 100;
+            document.getElementById('quiz-progress-bar').style.width = `${progressPercent}%`;
+
+            // Question title
+            document.getElementById('quiz-question-title').innerText = qData.qTitle;
+
+            // Render Table Visual
+            renderQuizTable(qData.table);
+
+            // Hide Next Button & Feedback Box
+            document.getElementById('btn-next-q').classList.add('hidden');
+            const feedbackBox = document.getElementById('quiz-feedback');
+            feedbackBox.classList.add('hidden');
+
+            // Render Options
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+
+            qData.options.forEach((optText, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left bg-darkBg hover:bg-slate-800 border border-cardBorder hover:border-accentPurple text-gray-200 p-4 rounded-xl font-medium transition flex items-center justify-between text-sm sm:text-base group`;
+                btn.onclick = () => selectOption(idx);
+                btn.id = `opt-btn-${idx}`;
+                btn.innerHTML = `
+                    <span>${optText}</span>
+                    <i class="fa-regular fa-circle text-gray-500 group-hover:text-accentPurple transition"></i>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function renderQuizTable(tableData) {
+            const container = document.getElementById('quiz-table-container');
+            let tableHTML = `<table class="quiz-table text-xs sm:text-sm font-mono w-full max-w-md"><thead><tr>`;
+            
+            tableData.headers.forEach(h => {
+                tableHTML += `<th>${h}</th>`;
+            });
+            tableHTML += `</tr></thead><tbody>`;
+
+            tableData.rows.forEach(row => {
+                tableHTML += `<tr>`;
+                row.forEach(cell => {
+                    let cellClass = "";
+                    if (cell === "?") {
+                        cellClass = "bg-accentPurple/20 text-accentPurple font-extrabold text-base border-2 border-accentPurple animate-pulse";
+                    } else if (cell === "T") {
+                        cellClass = "text-green-400 font-bold";
+                    } else if (cell === "F") {
+                        cellClass = "text-red-400 font-bold";
+                    }
+                    tableHTML += `<td class="${cellClass}">${cell}</td>`;
+                });
+                tableHTML += `</tr>`;
+            });
+
+            tableHTML += `</tbody></table>`;
+            container.innerHTML = tableHTML;
+        }
+
+        function selectOption(idx) {
+            if (selectedOptionIndex !== null) return;
+            selectedOptionIndex = idx;
+
+            const qData = truthTableQuestions[currentIndex];
+            const isCorrect = (idx === qData.answer);
+            const chosenBtn = document.getElementById(`opt-btn-${idx}`);
+            const feedbackBox = document.getElementById('quiz-feedback');
+
+            if (isCorrect) {
+                score += 10;
+                correctCount++;
+                chosenBtn.className = "w-full text-left bg-green-500/10 border-2 border-green-500 text-green-300 p-4 rounded-xl font-medium flex items-center justify-between text-sm sm:text-base";
+                chosenBtn.querySelector('i').className = "fa-solid fa-circle-check text-green-500";
+
+                feedbackBox.classList.remove('hidden');
+                feedbackBox.className = "p-4 rounded-xl text-sm mb-6 bg-green-500/10 border border-green-500/30 text-green-300";
+                feedbackBox.innerHTML = `<div class="font-bold mb-1"><i class="fa-solid fa-check-circle mr-1"></i> Benar!</div>${qData.explanation}`;
+            } else {
+                wrongCount++;
+                chosenBtn.className = "w-full text-left bg-red-500/10 border-2 border-red-500 text-red-300 p-4 rounded-xl font-medium flex items-center justify-between text-sm sm:text-base";
+                chosenBtn.querySelector('i').className = "fa-solid fa-circle-xmark text-red-500";
+
+                const correctBtn = document.getElementById(`opt-btn-${qData.answer}`);
+                if (correctBtn) {
+                    correctBtn.className = "w-full text-left bg-green-500/10 border border-green-500/50 text-green-300 p-4 rounded-xl font-medium flex items-center justify-between text-sm sm:text-base";
+                }
+
+                feedbackBox.classList.remove('hidden');
+                feedbackBox.className = "p-4 rounded-xl text-sm mb-6 bg-red-500/10 border border-red-500/30 text-red-300";
+                feedbackBox.innerHTML = `<div class="font-bold mb-1"><i class="fa-solid fa-xmark-circle mr-1"></i> Salah!</div>${qData.explanation}`;
+            }
+
+            document.getElementById('quiz-score-live').innerText = `Skor: ${score}`;
+            document.getElementById('btn-next-q').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            if (currentIndex < truthTableQuestions.length - 1) {
+                currentIndex++;
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            document.getElementById('quiz-card').classList.add('hidden');
+            document.getElementById('quiz-result-box').classList.remove('hidden');
+
+            document.getElementById('res-score').innerText = score;
+            document.getElementById('res-correct').innerText = correctCount;
+            document.getElementById('res-wrong').innerText = wrongCount;
+
+            const evalText = document.getElementById('result-evaluation-text');
+            if (score >= 80) {
+                evalText.innerText = "Luar biasa! Pemahaman Anda tentang Tabel Kebenaran sangat mendalam.";
+            } else if (score >= 50) {
+                evalText.innerText = "Bagus! Anda cukup memahami konsep dasar tabel kebenaran.";
+            } else {
+                evalText.innerText = "Jangan berkecil hati! Pelajari kembali menu 'Materi' dan pelajari pola tabel kebenaran.";
+            }
+        }
+
+        // --- SIMULATOR & TRUTH TABLE ENGINE ---
+        function insertOp(op) {
+            const input = document.getElementById('sim-input');
+            input.value += (input.value ? ' ' : '') + op + ' ';
+            input.focus();
+        }
+
+        function parseExpression(expr, vars) {
+            let sanitized = expr.toUpperCase();
+            
+            Object.keys(vars).forEach(v => {
+                const reg = new RegExp(`\\b${v}\\b`, 'g');
+                sanitized = sanitized.replace(reg, vars[v] ? 'true' : 'false');
+            });
+
+            sanitized = sanitized.replace(/\bIMPLIES\b/g, '== false ||');
+            sanitized = sanitized.replace(/\bXOR\b/g, '^');
+            sanitized = sanitized.replace(/\bAND\b/g, '&&');
+            sanitized = sanitized.replace(/\bOR\b/g, '||');
+            sanitized = sanitized.replace(/\bNOT\b/g, '!');
+
+            try {
+                return Boolean(Function(`"use strict"; return (${sanitized})`)());
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function generateTruthTable() {
+            const rawExpr = document.getElementById('sim-input').value.trim();
+            const resDiv = document.getElementById('sim-result');
+
+            if (!rawExpr) {
+                resDiv.innerHTML = `<div class="text-red-400 text-sm py-4">Silakan masukkan ekspresi logika terlebih dahulu.</div>`;
+                return;
+            }
+
+            const detectedVars = Array.from(new Set(rawExpr.toUpperCase().match(/\b[A-Z]\b/g) || []))
+                .filter(v => !['AND', 'OR', 'NOT', 'XOR', 'IMPLIES'].includes(v));
+
+            if (detectedVars.length === 0) {
+                resDiv.innerHTML = `<div class="text-red-400 text-sm py-4">Gunakan setidaknya satu variabel proposisi seperti P, Q, atau R.</div>`;
+                return;
+            }
+
+            const rowCount = Math.pow(2, detectedVars.length);
+            let tableHTML = `
+                <table class="quiz-table w-full text-center border-collapse text-sm">
+                    <thead>
+                        <tr>
+            `;
+
+            detectedVars.forEach(v => {
+                tableHTML += `<th>${v}</th>`;
+            });
+            tableHTML += `<th>${rawExpr}</th></tr></thead><tbody>`;
+
+            let hasError = false;
+
+            for (let i = 0; i < rowCount; i++) {
+                let varValues = {};
+                detectedVars.forEach((v, index) => {
+                    const bit = (i >> (detectedVars.length - 1 - index)) & 1;
+                    varValues[v] = bit === 0;
+                });
+
+                const result = parseExpression(rawExpr, varValues);
+
+                if (result === null) {
+                    hasError = true;
+                    break;
+                }
+
+                tableHTML += `<tr class="hover:bg-slate-800/50">`;
+                detectedVars.forEach(v => {
+                    const valStr = varValues[v] ? '<span class="text-green-400 font-bold">T</span>' : '<span class="text-red-400 font-bold">F</span>';
+                    tableHTML += `<td>${valStr}</td>`;
+                });
+
+                const resStr = result ? '<span class="text-green-400 font-bold">TRUE</span>' : '<span class="text-red-400 font-bold">FALSE</span>';
+                tableHTML += `<td class="font-mono">${resStr}</td></tr>`;
+            }
+
+            tableHTML += `</tbody></table>`;
+
+            if (hasError) {
+                resDiv.innerHTML = `<div class="text-red-400 text-sm py-4">Ekspresi tidak valid! Periksa sintaks penulisan operator.</div>`;
+            } else {
+                resDiv.innerHTML = tableHTML;
+            }
+        }
+
+        // --- VERIFIER LOGIC ---
+        function verifyEquivalence() {
+            const exprA = document.getElementById('ver-expr-a').value.trim();
+            const exprB = document.getElementById('ver-expr-b').value.trim();
+            const resDiv = document.getElementById('ver-result');
+
+            if (!exprA || !exprB) {
+                resDiv.innerHTML = `<div class="text-red-400 text-sm">Harap masukkan kedua ekspresi A dan B.</div>`;
+                return;
+            }
+
+            const combined = `${exprA} ${exprB}`;
+            const detectedVars = Array.from(new Set(combined.toUpperCase().match(/\b[A-Z]\b/g) || []))
+                .filter(v => !['AND', 'OR', 'NOT', 'XOR', 'IMPLIES'].includes(v));
+
+            const rowCount = Math.pow(2, detectedVars.length);
+            let isEquivalent = true;
+
+            for (let i = 0; i < rowCount; i++) {
+                let varValues = {};
+                detectedVars.forEach((v, index) => {
+                    const bit = (i >> (detectedVars.length - 1 - index)) & 1;
+                    varValues[v] = bit === 0;
+                });
+
+                const resA = parseExpression(exprA, varValues);
+                const resB = parseExpression(exprB, varValues);
+
+                if (resA === null || resB === null) {
+                    resDiv.innerHTML = `<div class="text-red-400 text-sm">Penulisan rumus tidak valid. Silakan cek kembali.</div>`;
+                    return;
+                }
+
+                if (resA !== resB) {
+                    isEquivalent = false;
+                    break;
+                }
+            }
+
+            if (isEquivalent) {
+                resDiv.innerHTML = `
+                    <div class="p-4 bg-green-500/10 border border-green-500/30 rounded-xl text-green-300 text-sm flex items-center gap-3">
+                        <i class="fa-solid fa-circle-check text-2xl"></i>
+                        <div>
+                            <div class="font-bold">Ekuivalen (Setara)!</div>
+                            Ekspresi A dan Ekspresi B menghasilkan nilai kebenaran yang persis sama untuk seluruh kondisi.
+                        </div>
+                    </div>
+                `;
+            } else {
+                resDiv.innerHTML = `
+                    <div class="p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300 text-sm flex items-center gap-3">
+                        <i class="fa-solid fa-circle-xmark text-2xl"></i>
+                        <div>
+                            <div class="font-bold">Tidak Ekuivalen!</div>
+                            Terdapat minimal satu kondisi nilai variabel di mana hasil Ekspresi A berbeda dengan Ekspresi B.
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize quiz on load
+        window.onload = function() {
+            initQuiz();
+        };
+    </script>
+</body>
+</html>
